@@ -15,7 +15,7 @@ const { setupSocketHandlers } = require('./services/socket.service');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 5005;
+const PORT = process.env.COMMUNICATION_PORT || 5005;
 
 // Socket.io setup
 const io = new Server(server, {

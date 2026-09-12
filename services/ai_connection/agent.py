@@ -7,11 +7,17 @@ from groq import Groq
 load_dotenv()
 
 # Configure Groq
-API_KEY = os.getenv("GROQ_API_KEY")
-if not API_KEY:
-    print("⚠️ Warning: GROQ_API_KEY not found in environment variables.")
+API_KEY = os.getenv("GROQ_API_KEY", "")
+client = None
+if API_KEY and API_KEY.strip() and API_KEY != "your_groq_api_key_here":
+    try:
+        client = Groq(api_key=API_KEY)
+    except Exception as e:
+        print(f"⚠️ Warning: Failed to initialize Groq client: {e}")
+        client = None
+else:
+    print("ℹ️ Note: GROQ_API_KEY not configured. AI assistant will run in guidance mode until a Groq key is added.")
 
-client = Groq(api_key=API_KEY)
 
 # Initial Model Configuration
 check_model = "llama-3.3-70b-versatile"
@@ -171,8 +177,16 @@ async def process_user_query(user_input: str, auth_token: Optional[str] = None, 
         session_id = auth_token[:16] if auth_token else "anonymous"
         pt.CURRENT_SESSION_ID = session_id
         set_session_token(session_id, auth_token)
-        
+
+        if not client:
+            return {
+                "response": "வணக்கம்! AgriBot AI குரல் சேவையை முழுமையாகப் பயன்படுத்த, உங்கள் .env கோப்பில் GROQ_API_KEY ஐ உள்ளிடவும்.\n\nHello! To use AgriBot AI features, please configure your free GROQ_API_KEY in the .env file.",
+                "action": None,
+                "data": {"status": "groq_key_required"}
+            }
+
         messages = get_history(session_id)
+
         
         # Add user message
         messages.append({"role": "user", "content": user_input})

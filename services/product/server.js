@@ -11,7 +11,7 @@ const productRoutes = require('./routes/product.routes');
 const { errorHandler } = require('../shared/middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 5003;
+const PORT = process.env.PRODUCT_PORT || 5003;
 
 // Middleware
 app.use(helmet());

@@ -1,42 +1,60 @@
-# AgriDirect Microservices Startup Script for Windows PowerShell
+[CmdletBinding()]
 param (
-    [switch]$Docker = $true,
-    [switch]$Down = $false,
-    [switch]$Status = $false
+    [switch]$Down,
+    [switch]$Status,
+    [switch]$Seed,
+    [switch]$Logs
 )
 
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-
-if ($Down) {
-    Write-Host "Stopping AgriDirect Docker containers..." -ForegroundColor Yellow
-    Set-Location $PSScriptRoot
-    docker compose down
-    Write-Host "All containers stopped." -ForegroundColor Green
-    exit 0
-}
-
-if ($Status) {
-    Write-Host "Checking AgriDirect Docker container status..." -ForegroundColor Cyan
-    docker ps --filter "name=agridirect"
-    exit 0
-}
-
-Write-Host "===================================" -ForegroundColor Cyan
-Write-Host "   AgriDirect Microservices Setup" -ForegroundColor Cyan
-Write-Host "===================================" -ForegroundColor Cyan
-Write-Host ""
-
 Set-Location $PSScriptRoot
 
-Write-Host "Starting services via Docker Compose..." -ForegroundColor Green
+if ($Down.IsPresent) {
+    Write-Host "🛑 Stopping KisanSetu Docker containers..." -ForegroundColor Yellow
+    docker compose down
+    Write-Host "✅ All containers stopped." -ForegroundColor Green
+    return
+}
+
+if ($Status.IsPresent) {
+    Write-Host "🔍 Checking KisanSetu Docker container status..." -ForegroundColor Cyan
+    docker compose ps
+    return
+}
+
+if ($Logs.IsPresent) {
+    Write-Host "📜 Showing KisanSetu logs..." -ForegroundColor Cyan
+    docker compose logs -f
+    return
+}
+
+if ($Seed.IsPresent) {
+    Write-Host "🌱 Seeding database with demo farmers and products..." -ForegroundColor Green
+    docker compose exec auth node seed.js
+    Write-Host "✅ Database seeded successfully!" -ForegroundColor Green
+    return
+}
+
+Write-Host "=================================================" -ForegroundColor Cyan
+Write-Host "   🌾 KisanSetu (AgriDirect) Ecosystem Setup" -ForegroundColor Cyan
+Write-Host "=================================================" -ForegroundColor Cyan
+Write-Host ""
+
+# Ensure .env exists
+if (-not (Test-Path ".env")) {
+    Write-Host "⚙️ Creating .env from .env.example..." -ForegroundColor Yellow
+    Copy-Item ".env.example" ".env"
+}
+
+Write-Host "🚀 Starting all services via Docker Compose..." -ForegroundColor Green
 docker compose up -d
 
 Write-Host ""
-Write-Host "Waiting 5 seconds for services to initialize..." -ForegroundColor Yellow
-Start-Sleep -Seconds 5
+Write-Host "⏳ Waiting for services to initialize..." -ForegroundColor Yellow
+Start-Sleep -Seconds 4
 
 Write-Host ""
-Write-Host "Services URL Map:" -ForegroundColor Cyan
+Write-Host "🌐 Services URL Map:" -ForegroundColor Cyan
 Write-Host "  Frontend (Web App):  http://localhost:5173" -ForegroundColor Green
 Write-Host "  API Gateway:         http://localhost:8000" -ForegroundColor White
 Write-Host "  Auth Service:        http://localhost:5001" -ForegroundColor White
@@ -49,5 +67,8 @@ Write-Host "  Payment Service:     http://localhost:5007" -ForegroundColor White
 Write-Host "  AI Service:          http://localhost:5008" -ForegroundColor White
 Write-Host "  MongoDB:             mongodb://localhost:27017" -ForegroundColor White
 Write-Host ""
-Write-Host "Check status anytime with: .\start-all.ps1 -Status" -ForegroundColor Yellow
-Write-Host "Stop all services with:    .\start-all.ps1 -Down" -ForegroundColor Yellow
+Write-Host "💡 Commands:" -ForegroundColor Yellow
+Write-Host "  Seed Demo Data:  .\start-all.ps1 -Seed" -ForegroundColor White
+Write-Host "  Check Status:    .\start-all.ps1 -Status" -ForegroundColor White
+Write-Host "  View Live Logs:  .\start-all.ps1 -Logs" -ForegroundColor White
+Write-Host "  Stop Services:   .\start-all.ps1 -Down" -ForegroundColor White

@@ -12,7 +12,7 @@ const optimizationRoutes = require('./routes/optimization.routes');
 const { errorHandler } = require('../shared/middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 5004;
+const PORT = process.env.ORDER_PORT || 5004;
 
 // Middleware
 app.use(helmet());

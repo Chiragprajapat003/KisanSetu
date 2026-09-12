@@ -4,7 +4,8 @@ import { FaRobot, FaMicrophone, FaPaperPlane, FaTimes, FaCamera, FaVolumeUp } fr
 import { BiMicrophoneOff } from 'react-icons/bi';
 import { AuthContext } from '../../contexts/AuthContext';
 
-const AI_SERVICE_URL = 'http://localhost:5008';
+const AI_SERVICE_URL = import.meta.env.VITE_AI_URL || 'http://localhost:5008';
+
 
 const AIChatAssistant = () => {
     const { user, token } = useContext(AuthContext);

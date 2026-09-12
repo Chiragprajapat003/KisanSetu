@@ -13,7 +13,7 @@ const kycRoutes = require('./routes/kyc.routes');
 const { errorHandler } = require('../shared/middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.USER_PORT || 5002;
 
 // Middleware
 app.use(helmet());

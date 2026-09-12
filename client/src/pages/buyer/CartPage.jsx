@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
 import { useAuth } from '../../hooks/useAuth';
-import { createOrder } from '../../services/order.service';
+import { createOrder, verifyOTP } from '../../services/order.service';
+
+
+import { createPaymentOrder } from '../../services/payment.service';
 import PaymentOptions from '../../components/payment/PaymentOptions';
+
 import RazorpayCheckout from '../../components/payment/RazorpayCheckout';
 import QRCodeModal from '../../components/payment/QRCodeModal.jsx';
 import Toast, { useToast } from '../../components/shared/Toast.jsx';
@@ -56,16 +60,9 @@ const CartPage = () => {
 
             if (!orderId) throw new Error("No order ID to verify");
 
-            const res = await fetch(`/api/orders/${orderId}/verify-otp`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({ otp })
-            });
+            const res = await verifyOTP(orderId, otp);
+            const data = res.data;
 
-            const data = await res.json();
 
             if (data.success) {
                 success('Order verified! Thank you.');
@@ -134,36 +131,32 @@ const CartPage = () => {
 
             const receivedOtp = responseData.devOtp || ordersList[0]?.devOtp;
             if (receivedOtp) {
-                console.log('🔑 [DEBUG] Received OTP for order:', receivedOtp);
+                console.log('%c====================================', 'color: #10b981; font-weight: bold;');
+                console.log('%c🔑 YOUR ORDER OTP CODE IS: ' + receivedOtp, 'background: #047857; color: #ffffff; font-size: 22px; font-weight: bold; padding: 10px 20px; border-radius: 8px;');
+                console.log('%c====================================', 'color: #10b981; font-weight: bold;');
                 setDevOtp(receivedOtp);
                 setOtp(receivedOtp); // Pre-fill for instant testability
+                success(`🔑 Order OTP: ${receivedOtp}`);
             }
+
 
             if (paymentMethod === 'cash') {
                 console.log('💰 Cash Payment - OTP Flow');
 
-                // NEW: Ensure Payment Record is created for Cash Orders too
+                // Ensure Payment Record is created for Cash Orders too
                 const createdOrderId = responseData.orders && responseData.orders.length > 0
                     ? responseData.orders[0]._id
                     : (responseData.order ? responseData.order._id : null);
 
                 if (createdOrderId) {
                     try {
-                        await fetch('/api/payments/create-order', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem('token')}`
-                            },
-                            body: JSON.stringify({
-                                orderId: createdOrderId,
-                                paymentMethod: 'cash'
-                            })
+                        await createPaymentOrder({
+                            orderId: createdOrderId,
+                            paymentMethod: 'cash'
                         });
                         console.log('✅ Cash Payment Record Created');
                     } catch (payErr) {
                         console.error('⚠️ Failed to create cash payment record:', payErr);
-                        // Don't block flow, but log it
                     }
                 }
 
@@ -182,19 +175,12 @@ const CartPage = () => {
                     throw new Error('Failed to retrieve order ID from response');
                 }
 
-                const paymentRes = await fetch('/api/payments/create-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({
-                        orderId: createdOrderId,
-                        paymentMethod: 'online'
-                    })
+                const paymentRes = await createPaymentOrder({
+                    orderId: createdOrderId,
+                    paymentMethod: 'online'
                 });
 
-                const paymentData = await paymentRes.json();
+                const paymentData = paymentRes.data;
 
                 if (paymentData.success) {
                     setCreatedOrder(paymentData);
@@ -203,6 +189,7 @@ const CartPage = () => {
                     error(paymentData.message || 'Failed to initiate payment');
                 }
             }
+
 
         } catch (err) {
             console.error('❌ Checkout Error:', err);

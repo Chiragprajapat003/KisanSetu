@@ -11,7 +11,7 @@ const feedbackRoutes = require('./routes/feedback.routes');
 const { errorHandler } = require('../shared/middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 5006;
+const PORT = process.env.FEEDBACK_PORT || 5006;
 
 // Middleware
 app.use(helmet());

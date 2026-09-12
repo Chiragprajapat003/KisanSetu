@@ -1,9 +1,8 @@
-version: '3.8'
-
 services:
   # Base Infrastructure
   mongo:
     image: mongo:latest
+    restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
@@ -16,6 +15,7 @@ services:
     build:
       context: .
       dockerfile: services/gateway/Dockerfile
+    restart: unless-stopped
     ports:
       - "8000:8000"
     env_file: .env
@@ -28,6 +28,7 @@ services:
     build:
       context: .
       dockerfile: services/auth/Dockerfile
+    restart: unless-stopped
     ports:
       - "5001:5001"
     env_file: .env
@@ -40,6 +41,7 @@ services:
     build:
       context: .
       dockerfile: services/user/Dockerfile
+    restart: unless-stopped
     ports:
       - "5002:5002"
     env_file: .env
@@ -52,6 +54,7 @@ services:
     build:
       context: .
       dockerfile: services/product/Dockerfile
+    restart: unless-stopped
     ports:
       - "5003:5003"
     env_file: .env
@@ -64,6 +67,7 @@ services:
     build:
       context: .
       dockerfile: services/order/Dockerfile
+    restart: unless-stopped
     ports:
       - "5004:5004"
     env_file: .env
@@ -76,6 +80,7 @@ services:
     build:
       context: .
       dockerfile: services/communication/Dockerfile
+    restart: unless-stopped
     ports:
       - "5005:5005"
     env_file: .env
@@ -88,6 +93,7 @@ services:
     build:
       context: .
       dockerfile: services/feedback/Dockerfile
+    restart: unless-stopped
     ports:
       - "5006:5006"
     env_file: .env
@@ -100,6 +106,7 @@ services:
     build:
       context: .
       dockerfile: services/payment/Dockerfile
+    restart: unless-stopped
     ports:
       - "5007:5007"
     env_file: .env
@@ -112,6 +119,7 @@ services:
     build:
       context: .
       dockerfile: services/ai_connection/Dockerfile
+    restart: unless-stopped
     ports:
       - "5008:5008"
     env_file: .env
@@ -123,8 +131,12 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "5173:80"
+    depends_on:
+      - gateway
+      - communication
     networks:
       - agridirect-net
 

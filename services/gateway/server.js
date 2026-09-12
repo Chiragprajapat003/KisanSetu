@@ -8,7 +8,8 @@ const rateLimit = require('express-rate-limit');
 const http = require('http');
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.GATEWAY_PORT || 8000;
+
 
 // Middleware
 app.use(helmet());
