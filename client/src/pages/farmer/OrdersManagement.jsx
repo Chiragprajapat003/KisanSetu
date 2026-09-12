@@ -80,13 +80,16 @@ const OrdersManagement = () => {
             <div className="container">
                 <div className="page-header">
                     <div className="page-header-top">
-                        <h1 className="page-title">Orders</h1>
+                        <div>
+                            <h1 className="page-title">Orders</h1>
+                            <p className="page-subtitle">Track and fulfil your buyer orders</p>
+                        </div>
                         <button
-                            className="btn btn-optimize"
+                            className="btn btn-secondary"
                             onClick={() => setShowOptimizeModal(true)}
                             title="Optimize delivery route for multiple orders"
                         >
-                            🚚 Optimize Route
+                            Plan delivery route
                         </button>
                     </div>
                     <div className="filter-tabs">
@@ -101,11 +104,11 @@ const OrdersManagement = () => {
 
                 {filteredOrders.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-state-icon">📋</div>
                         <h3>No orders found</h3>
                         <p>{filter === 'all' ? 'You have no orders yet' : `No ${filter} orders`}</p>
                     </div>
                 ) : (
+                    <>
                     <div className="orders-table">
                         <table>
                             <thead>
@@ -123,7 +126,6 @@ const OrdersManagement = () => {
                             <tbody>
                                 {filteredOrders
                                     .sort((a, b) => {
-                                        // Sort by sequence if available, then by date
                                         const seqA = a.deliverySequence?.sequence || 9999;
                                         const seqB = b.deliverySequence?.sequence || 9999;
                                         return seqA - seqB || new Date(b.createdAt) - new Date(a.createdAt);
@@ -153,16 +155,14 @@ const OrdersManagement = () => {
                                             <td>{order.items?.reduce((acc, i) => acc + i.quantity, 0)} kg</td>
                                             <td className="price-cell">
                                                 ₹{order.totalPrice}
-                                                {/* Only show payment status for non-cancelled orders with cash payment */}
                                                 {order.paymentMethod === 'cash' && order.status !== 'cancelled' && (
-                                                    <div style={{ fontSize: '0.8rem', color: order.paymentStatus === 'paid' ? 'green' : 'orange' }}>
-                                                        {order.paymentStatus === 'paid' ? '✓ Paid' : 'Cash Pending'}
+                                                    <div style={{ fontSize: '0.75rem', color: order.paymentStatus === 'paid' ? 'var(--color-primary)' : '#8A6D3B', marginTop: '2px' }}>
+                                                        {order.paymentStatus === 'paid' ? 'Paid' : 'Cash pending'}
                                                     </div>
                                                 )}
-                                                {/* Show online payment status */}
                                                 {order.paymentMethod === 'online' && order.status !== 'cancelled' && (
-                                                    <div style={{ fontSize: '0.8rem', color: order.paymentStatus === 'paid' ? 'green' : 'blue' }}>
-                                                        {order.paymentStatus === 'paid' ? '✓ Online Paid' : 'Online Pending'}
+                                                    <div style={{ fontSize: '0.75rem', color: order.paymentStatus === 'paid' ? 'var(--color-primary)' : '#2B5A7A', marginTop: '2px' }}>
+                                                        {order.paymentStatus === 'paid' ? 'Paid online' : 'Online pending'}
                                                     </div>
                                                 )}
                                             </td>
@@ -175,11 +175,10 @@ const OrdersManagement = () => {
                                             </td>
                                             <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                                             <td>
-                                                {/* Confirmed - Farmer can start processing */}
                                                 {order.status === 'confirmed' && (
                                                     <div className="action-buttons">
                                                         <button onClick={() => handleStatusUpdate(order._id, 'processing')}
-                                                            className="btn btn-primary btn-sm">Start Processing</button>
+                                                            className="btn btn-primary btn-sm">Start processing</button>
                                                         <button onClick={() => setCancelModal({ show: true, orderId: order._id, reason: '' })}
                                                             className="btn btn-outline-danger btn-sm">Cancel</button>
                                                     </div>
@@ -187,15 +186,16 @@ const OrdersManagement = () => {
                                                 {order.status === 'processing' && (
                                                     <div className="action-buttons">
                                                         <button onClick={() => handleStatusUpdate(order._id, 'shipped')}
-                                                            className="btn btn-primary btn-sm">Ship</button>
+                                                            className="btn btn-primary btn-sm">Mark shipped</button>
                                                         {order.buyerDetails?.coordinates?.length === 2 && (
                                                             <a
                                                                 href={`https://www.google.com/maps/dir/?api=1&destination=${order.buyerDetails.coordinates[1]},${order.buyerDetails.coordinates[0]}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="route-link"
+                                                                className="btn btn-secondary btn-sm"
+                                                                style={{ textDecoration: 'none' }}
                                                             >
-                                                                Show Route 📍
+                                                                View route
                                                             </a>
                                                         )}
                                                         <button onClick={() => setCancelModal({ show: true, orderId: order._id, reason: '' })}
@@ -206,15 +206,16 @@ const OrdersManagement = () => {
                                                     <div className="action-column">
                                                         <div className="action-buttons">
                                                             <button onClick={() => handleStatusUpdate(order._id, 'delivered')}
-                                                                className="btn btn-primary btn-sm">Deliver</button>
+                                                                className="btn btn-primary btn-sm">Mark delivered</button>
                                                             {order.buyerDetails?.coordinates?.length === 2 && (
                                                                 <a
                                                                     href={`https://www.google.com/maps/dir/?api=1&destination=${order.buyerDetails.coordinates[1]},${order.buyerDetails.coordinates[0]}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="route-link"
+                                                                    className="btn btn-secondary btn-sm"
+                                                                    style={{ textDecoration: 'none' }}
                                                                 >
-                                                                    Show Route 📍
+                                                                    View route
                                                                 </a>
                                                             )}
                                                             <button onClick={() => setCancelModal({ show: true, orderId: order._id, reason: '' })}
@@ -222,25 +223,24 @@ const OrdersManagement = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                                {/* Delivered Logic with Cash Confirmation */}
                                                 {order.status === 'delivered' && (
                                                     <div className="action-buttons">
                                                         {order.paymentMethod === 'cash' && order.paymentStatus !== 'paid' && (
                                                             <button
                                                                 onClick={() => handleCashConfirmation(order._id)}
-                                                                className="btn btn-success btn-sm"
+                                                                className="btn btn-primary btn-sm"
                                                                 title="Confirm you received cash from buyer"
                                                             >
-                                                                Confirm Cash 💰
+                                                                Confirm cash received
                                                             </button>
                                                         )}
-                                                        <span className="text-muted" style={{ fontSize: '0.9rem' }}>Completed</span>
+                                                        <span className="text-muted" style={{ fontSize: '0.82rem' }}>Completed</span>
                                                     </div>
                                                 )}
 
                                                 {order.status === 'pending' && (
                                                     <div className="action-buttons">
-                                                        <span className="pending-text">Awaiting OTP</span>
+                                                        <span className="text-muted" style={{ fontSize: '0.82rem' }}>Awaiting buyer confirmation</span>
                                                         <button onClick={() => setCancelModal({ show: true, orderId: order._id, reason: '' })}
                                                             className="btn btn-outline-danger btn-sm">Cancel</button>
                                                     </div>
@@ -251,31 +251,95 @@ const OrdersManagement = () => {
                             </tbody>
                         </table>
                     </div>
+                    <div className="orders-cards">
+                        {filteredOrders
+                            .sort((a, b) => {
+                                const seqA = a.deliverySequence?.sequence || 9999;
+                                const seqB = b.deliverySequence?.sequence || 9999;
+                                return seqA - seqB || new Date(b.createdAt) - new Date(a.createdAt);
+                            })
+                            .map(order => (
+                                <div key={order._id} className="order-card-mobile">
+                                    <div className="order-card-mobile-top">
+                                        <div style={{ minWidth: 0, flex: 1 }}>
+                                            <div className="order-card-mobile-title">{order.items?.map(i => i.name).join(', ')}</div>
+                                            <div className="order-card-mobile-meta">{order.buyerDetails?.name} • {order.buyerDetails?.phno || ''}</div>
+                                        </div>
+                                        <span className={`badge badge-${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : order.status === 'pending' ? 'warning' : 'primary'}`}>{order.status}</span>
+                                    </div>
+                                    {order.deliverySequence?.sequence && ['processing','shipped'].includes(order.status) && (
+                                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--color-primary-subtle)', border: '1px solid #D6E4D8', borderRadius: '999px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-primary)', marginBottom: '10px' }}>Stop #{order.deliverySequence.sequence}</div>
+                                    )}
+                                    <dl className="order-card-mobile-grid">
+                                        <div><dt>Quantity</dt><dd>{order.items?.reduce((acc, i) => acc + i.quantity, 0)} kg</dd></div>
+                                        <div><dt>Total</dt><dd>₹{order.totalPrice}</dd></div>
+                                        <div><dt>Payment</dt><dd>{order.paymentMethod === 'cash' ? (order.paymentStatus === 'paid' ? 'Paid (cash)' : 'Cash pending') : (order.paymentStatus === 'paid' ? 'Paid online' : 'Online pending')}</dd></div>
+                                        <div><dt>Date</dt><dd>{new Date(order.createdAt).toLocaleDateString()}</dd></div>
+                                    </dl>
+                                    <div className="action-buttons">
+                                        {order.status === 'confirmed' && (
+                                            <>
+                                                <button onClick={() => handleStatusUpdate(order._id, 'processing')} className="btn btn-primary btn-sm" style={{ flex: 1 }}>Start processing</button>
+                                                <button onClick={() => setCancelModal({ show: true, orderId: order._id, reason: '' })} className="btn btn-outline-danger btn-sm">Cancel</button>
+                                            </>
+                                        )}
+                                        {order.status === 'processing' && (
+                                            <>
+                                                <button onClick={() => handleStatusUpdate(order._id, 'shipped')} className="btn btn-primary btn-sm" style={{ flex: 1 }}>Mark shipped</button>
+                                                {order.buyerDetails?.coordinates?.length === 2 && (
+                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${order.buyerDetails.coordinates[1]},${order.buyerDetails.coordinates[0]}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm">Route</a>
+                                                )}
+                                            </>
+                                        )}
+                                        {order.status === 'shipped' && (
+                                            <>
+                                                <button onClick={() => handleStatusUpdate(order._id, 'delivered')} className="btn btn-primary btn-sm" style={{ flex: 1 }}>Mark delivered</button>
+                                                {order.buyerDetails?.coordinates?.length === 2 && (
+                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${order.buyerDetails.coordinates[1]},${order.buyerDetails.coordinates[0]}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm">Route</a>
+                                                )}
+                                            </>
+                                        )}
+                                        {order.status === 'delivered' && order.paymentMethod === 'cash' && order.paymentStatus !== 'paid' && (
+                                            <button onClick={() => handleCashConfirmation(order._id)} className="btn btn-primary btn-sm" style={{ flex: 1 }}>Confirm cash received</button>
+                                        )}
+                                        {order.status === 'pending' && (
+                                            <span className="text-muted" style={{ fontSize: '0.82rem' }}>Waiting for buyer to verify OTP</span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                    </>
                 )}
 
                 {/* Cancel Modal */}
                 {cancelModal.show && (
                     <div className="modal-overlay" onClick={() => setCancelModal({ show: false, orderId: null, reason: '' })}>
                         <div className="modal" onClick={e => e.stopPropagation()}>
-                            <h2>Cancel Order</h2>
-                            <p className="text-muted">Please provide a reason. This will be sent to the buyer via chat.</p>
-                            <form onSubmit={handleCancelOrder}>
-                                <div className="form-group">
-                                    <label>Reason for Cancellation</label>
-                                    <textarea
-                                        value={cancelModal.reason}
-                                        onChange={e => setCancelModal({ ...cancelModal, reason: e.target.value })}
-                                        className="form-input"
-                                        required
-                                        rows="3"
-                                        placeholder="E.g., Out of stock, Quality issue..."
-                                    ></textarea>
-                                </div>
-                                <div className="modal-actions">
-                                    <button type="button" onClick={() => setCancelModal({ show: false, orderId: null, reason: '' })} className="btn btn-secondary">Keep Order</button>
-                                    <button type="submit" className="btn btn-danger">Confirm Cancellation</button>
-                                </div>
-                            </form>
+                            <div className="modal-header">
+                                <h2>Cancel order</h2>
+                                <button className="close-btn" onClick={() => setCancelModal({ show: false, orderId: null, reason: '' })} aria-label="Close">&times;</button>
+                            </div>
+                            <div className="modal-body">
+                                <p className="text-muted" style={{ marginBottom: '14px', fontSize: '0.875rem' }}>Share a reason — it will be sent to the buyer in chat.</p>
+                                <form onSubmit={handleCancelOrder}>
+                                    <div className="form-group">
+                                        <label>Reason <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+                                        <textarea
+                                            value={cancelModal.reason}
+                                            onChange={e => setCancelModal({ ...cancelModal, reason: e.target.value })}
+                                            className="form-input"
+                                            required
+                                            rows="3"
+                                            placeholder="e.g. Out of stock, will restock tomorrow"
+                                        ></textarea>
+                                    </div>
+                                    <div className="modal-actions" style={{ borderTop: 'none', padding: '12px 0 0', background: 'transparent' }}>
+                                        <button type="button" onClick={() => setCancelModal({ show: false, orderId: null, reason: '' })} className="btn btn-secondary">Keep order</button>
+                                        <button type="submit" className="btn btn-danger">Cancel order</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 )}
