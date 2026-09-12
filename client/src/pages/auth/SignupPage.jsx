@@ -59,8 +59,8 @@ const SignupPage = () => {
         <div className="auth-page">
             <div className="auth-container auth-container-wide">
                 <div className="auth-header">
-                    <h1 className="auth-title">Create Account</h1>
-                    <p className="auth-subtitle">Join AgriDirect as a farmer or buyer</p>
+                    <h1 className="auth-title">Create your account</h1>
+                    <p className="auth-subtitle">Join KisanSetu — choose farmer or buyer to get started</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
@@ -148,8 +148,8 @@ const SignupPage = () => {
                     </div>
 
                     <div className="form-section location-section">
-                        <label className="section-label">📍 Your Location (Optional)</label>
-                        <p className="section-hint">Select your location for better delivery experience</p>
+                        <label className="section-label">Location (optional)</label>
+                        <p className="section-hint">Add your location now for faster deliveries — you can change it later</p>
                         <LocationPicker
                             value={formData.location}
                             onChange={(location) => setFormData(prev => ({ ...prev, location }))}
