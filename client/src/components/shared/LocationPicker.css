@@ -1,183 +1,56 @@
-.location-picker {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.location-picker-controls {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.location-picker-btn {
-    white-space: nowrap;
-    padding: 0.5rem 1rem;
-}
-
-.location-picker-search {
-    display: flex;
-    gap: 0.25rem;
-    flex: 1;
-    min-width: 200px;
-}
-
-.location-picker-search input {
-    flex: 1;
-    min-width: 0;
-}
-
-.location-picker-search .btn {
-    padding: 0.5rem 0.75rem;
-}
-
+.location-picker { display: flex; flex-direction: column; gap: 10px; }
+.location-picker-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.location-picker-btn { white-space: nowrap; }
+.location-picker-search { display: flex; gap: 6px; flex: 1; min-width: 180px; }
+.location-picker-search input { flex: 1; min-width: 0; }
 .location-picker-message {
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm, 4px);
-    font-size: 0.875rem;
+    padding: 9px 12px;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    border: 1px solid transparent;
 }
-
-.location-picker-message-info {
-    background: #e0f2fe;
-    color: #0369a1;
-}
-
-.location-picker-message-success {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.location-picker-message-error {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
+.location-picker-message-info { background: var(--color-info-light); color: #1E3A4F; border-color: #D6E4EE; }
+.location-picker-message-success { background: var(--color-success-light); color: #143620; border-color: #C8D8CA; }
+.location-picker-message-error { background: var(--color-danger-light); color: #7A2525; border-color: #E8C4C4; }
 .location-picker-map {
     width: 100%;
-    height: 250px;
-    border-radius: var(--radius-md, 8px);
-    border: 2px solid var(--color-border, #e5e7eb);
+    height: 240px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
     z-index: 1;
 }
-
 .location-picker-display {
-    background: var(--color-bg, #f9fafb);
-    padding: 0.75rem;
-    border-radius: var(--radius-md, 8px);
-    border-left: 4px solid var(--color-primary, #22c55e);
-    font-size: 0.875rem;
+    background: var(--color-bg-soft);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--color-primary);
+    font-size: 0.82rem;
+    line-height: 1.4;
     word-break: break-word;
 }
-
-.location-picker-display strong {
-    color: var(--color-primary, #22c55e);
-}
-
-
+.location-picker-display strong { color: var(--color-primary); }
 @media (max-width: 480px) {
-    .location-picker-controls {
-        flex-direction: column;
-    }
-
-    .location-picker-btn {
-        width: 100%;
-    }
-
-    .location-picker-search {
-        width: 100%;
-    }
+    .location-picker-controls { flex-direction: column; }
+    .location-picker-btn { width: 100%; }
+    .location-picker-search { width: 100%; }
 }
-
-
 .gps-progress-container {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 1px solid #bae6fd;
-    border-radius: var(--radius-md, 8px);
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
+    background: var(--color-bg-soft);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: 10px;
 }
-
-.gps-progress-bar {
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 0.5rem;
-}
-
-.gps-progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease, background-color 0.3s ease;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-.gps-progress-acquiring {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-
-.gps-progress-moderate {
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-}
-
-.gps-progress-good {
-    background: linear-gradient(90deg, #10b981, #34d399);
-}
-
-.gps-progress-excellent {
-    background: linear-gradient(90deg, #22c55e, #4ade80);
-    animation: none;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
-}
-
-.gps-progress-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.75rem;
-    color: #475569;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.gps-progress-samples {
-    font-weight: 500;
-}
-
-.gps-progress-accuracy {
-    font-weight: 600;
-    padding: 0.125rem 0.5rem;
-    border-radius: 9999px;
-    font-size: 0.7rem;
-}
-
-.gps-accuracy-acquiring {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.gps-accuracy-moderate {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.gps-accuracy-good {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.gps-accuracy-excellent {
-    background: #bbf7d0;
-    color: #166534;
-}
+.gps-progress-bar { height: 6px; background: var(--color-border-light); border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
+.gps-progress-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+.gps-progress-acquiring { background: #C9A96E; }
+.gps-progress-moderate { background: #8A9A8A; }
+.gps-progress-good { background: #2D6A4F; }
+.gps-progress-excellent { background: var(--color-primary); }
+.gps-progress-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--color-text-light); gap: 8px; flex-wrap: wrap; }
+.gps-progress-accuracy { font-weight: 600; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; border: 1px solid transparent; }
+.gps-accuracy-acquiring { background: var(--color-warning-light); color: #5A4310; border-color: #EDE0C4; }
+.gps-accuracy-moderate { background: var(--color-info-light); color: #1E3A4F; border-color: #D6E4EE; }
+.gps-accuracy-good { background: var(--color-success-light); color: #143620; border-color: #C8D8CA; }
+.gps-accuracy-excellent { background: var(--color-primary-muted); color: var(--color-primary); border-color: #D6E4D8; }
