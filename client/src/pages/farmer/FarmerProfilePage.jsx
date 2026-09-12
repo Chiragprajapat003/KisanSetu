@@ -119,8 +119,8 @@ const FarmerProfilePage = () => {
     return (
         <div className="farmer-profile-page">
             <div className="container">
-                <h1>🌾 Farm Profile</h1>
-                <p>Manage your farm information and location</p>
+                <h1 className="page-title" style={{ marginBottom: '4px' }}>Farm profile</h1>
+                <p className="page-subtitle">Update your farm details and location</p>
 
                 {message.text && <div className={`alert alert-${message.type}`}>{message.text}</div>}
 
@@ -170,15 +170,15 @@ const FarmerProfilePage = () => {
                     </div>
 
                     <div className="form-section">
-                        <h3>Farm Location</h3>
-                        <p style={{ color: '#666', marginBottom: '1rem' }}>Set your farm location for accurate deliveries</p>
+                        <h3>Farm location</h3>
+                        <p className="text-muted" style={{ marginBottom: '12px' }}>Set your exact farm location for accurate deliveries.</p>
 
                         {formData.location?.address && (
-                            <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', borderLeft: '4px solid #22c55e' }}>
-                                <strong>📍 Current Location:</strong> {formData.location.address}
+                            <div style={{ background: 'var(--color-success-light)', padding: '12px 14px', borderRadius: '10px', marginBottom: '12px', border: '1px solid #C8D8CA', borderLeft: '3px solid var(--color-primary)' }}>
+                                <strong style={{ fontSize: '0.85rem' }}>Current location:</strong> <span style={{ fontSize: '0.85rem' }}>{formData.location.address}</span>
                                 {formData.location?.coordinates?.length === 2 && (
-                                    <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.25rem' }}>
-                                        Coordinates: {formData.location.coordinates[1].toFixed(6)}, {formData.location.coordinates[0].toFixed(6)}
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                                        {formData.location.coordinates[1].toFixed(5)}, {formData.location.coordinates[0].toFixed(5)}
                                     </div>
                                 )}
                             </div>
@@ -189,34 +189,39 @@ const FarmerProfilePage = () => {
                             onClick={() => setShowLocationModal(true)}
                             className="btn btn-secondary"
                         >
-                            📍 {formData.location?.address ? 'Update Location' : 'Set Location'}
+                            {formData.location?.address ? 'Update location' : 'Set location'}
                         </button>
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-lg" disabled={saving} style={{ marginTop: '1rem' }}>
-                        {saving ? 'Saving...' : 'Save Profile'}
+                    <button type="submit" className="btn btn-primary" disabled={saving} style={{ marginTop: '12px' }}>
+                        {saving ? 'Saving…' : 'Save changes'}
                     </button>
                 </form>
 
                 <KYCSection farmerId={profile?._id} />
 
-                <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px' }}>
-                    <h3 style={{ color: '#dc2626' }}>⚠️ Danger Zone</h3>
-                    <p style={{ color: '#7f1d1d', marginBottom: '1rem' }}>Deleting your account will remove all your products, orders and data permanently.</p>
-                    <button onClick={() => setShowDeleteConfirm(true)} className="btn" style={{ background: '#dc2626', color: 'white' }}>
-                        Delete My Account
+                <div style={{ marginTop: '20px', padding: '16px', background: 'var(--color-danger-light)', border: '1px solid #E8C4C4', borderRadius: '12px' }}>
+                    <h3 style={{ color: 'var(--color-danger)', fontSize: '0.95rem', marginBottom: '6px' }}>Danger zone</h3>
+                    <p style={{ color: '#7A2525', marginBottom: '12px', fontSize: '0.85rem', lineHeight: 1.4 }}>Deleting your account will permanently remove your products and orders.</p>
+                    <button onClick={() => setShowDeleteConfirm(true)} className="btn btn-outline-danger btn-sm">
+                        Delete account
                     </button>
                 </div>
 
                 {showDeleteConfirm && (
                     <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
                         <div className="modal" onClick={e => e.stopPropagation()}>
-                            <h3 style={{ color: '#dc2626' }}>🚨 Delete Account?</h3>
-                            <p style={{ margin: '1rem 0', color: '#666' }}>All products, orders, and data will be permanently deleted.</p>
+                            <div className="modal-header">
+                                <h2 style={{ color: 'var(--color-danger)' }}>Delete account?</h2>
+                                <button className="close-btn" onClick={() => setShowDeleteConfirm(false)} aria-label="Close">&times;</button>
+                            </div>
+                            <div className="modal-body">
+                                <p className="text-muted" style={{ fontSize: '0.875rem' }}>All products and orders will be permanently removed. This cannot be undone.</p>
+                            </div>
                             <div className="modal-actions">
                                 <button onClick={() => setShowDeleteConfirm(false)} className="btn btn-secondary" disabled={deleting}>Cancel</button>
-                                <button onClick={handleDeleteAccount} className="btn" style={{ background: '#dc2626', color: 'white' }} disabled={deleting}>
-                                    {deleting ? 'Deleting...' : 'Yes, Delete'}
+                                <button onClick={handleDeleteAccount} className="btn btn-danger" disabled={deleting}>
+                                    {deleting ? 'Deleting…' : 'Delete account'}
                                 </button>
                             </div>
                         </div>
@@ -225,16 +230,21 @@ const FarmerProfilePage = () => {
 
                 {showLocationModal && (
                     <div className="modal-overlay" onClick={() => setShowLocationModal(false)}>
-                        <div className="modal" style={{ maxWidth: '700px' }} onClick={e => e.stopPropagation()}>
-                            <h2>📍 Update Farm Location</h2>
-                            <p style={{ color: '#666', marginBottom: '1rem' }}>
-                                Select your exact farm location for delivery purposes.
-                            </p>
+                        <div className="modal" style={{ maxWidth: '680px' }} onClick={e => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h2>Update farm location</h2>
+                                <button className="close-btn" onClick={() => setShowLocationModal(false)} aria-label="Close">&times;</button>
+                            </div>
+                            <div className="modal-body">
+                                <p className="text-muted" style={{ marginBottom: '12px', fontSize: '0.875rem' }}>
+                                    Pin your exact farm location for accurate pickups.
+                                </p>
                             <LocationPicker
                                 value={formData.location}
                                 onChange={handleLocationChange}
                             />
-                            <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+                            </div>
+                            <div className="modal-actions">
                                 <button onClick={() => setShowLocationModal(false)} className="btn btn-secondary">Cancel</button>
                                 <button onClick={() => setShowLocationModal(false)} className="btn btn-primary">Done</button>
                             </div>
