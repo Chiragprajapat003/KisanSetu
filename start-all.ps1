@@ -3,7 +3,8 @@ param (
     [switch]$Down,
     [switch]$Status,
     [switch]$Seed,
-    [switch]$Logs
+    [switch]$Logs,
+    [switch]$Build
 )
 
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
@@ -46,8 +47,13 @@ if (-not (Test-Path ".env")) {
     Copy-Item ".env.example" ".env"
 }
 
-Write-Host "🚀 Starting all services via Docker Compose..." -ForegroundColor Green
-docker compose up -d
+if ($Build.IsPresent) {
+    Write-Host "🚀 Rebuilding and starting all services via Docker Compose..." -ForegroundColor Green
+    docker compose up -d --build
+} else {
+    Write-Host "🚀 Starting all services via Docker Compose..." -ForegroundColor Green
+    docker compose up -d
+}
 
 Write-Host ""
 Write-Host "⏳ Waiting for services to initialize..." -ForegroundColor Yellow
@@ -68,6 +74,7 @@ Write-Host "  AI Service:          http://localhost:5008" -ForegroundColor White
 Write-Host "  MongoDB:             mongodb://localhost:27017" -ForegroundColor White
 Write-Host ""
 Write-Host "💡 Commands:" -ForegroundColor Yellow
+Write-Host "  Rebuild & Start: .\start-all.ps1 -Build" -ForegroundColor White
 Write-Host "  Seed Demo Data:  .\start-all.ps1 -Seed" -ForegroundColor White
 Write-Host "  Check Status:    .\start-all.ps1 -Status" -ForegroundColor White
 Write-Host "  View Live Logs:  .\start-all.ps1 -Logs" -ForegroundColor White
