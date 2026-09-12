@@ -98,18 +98,18 @@ const ProductManagement = () => {
             <div className="container">
                 <div className="page-header">
                     <div>
-                        <h1 className="page-title">My Products</h1>
-                        <p className="page-subtitle">{products.length} products listed</p>
+                        <h1 className="page-title">My products</h1>
+                        <p className="page-subtitle">{products.length === 0 ? 'Add your first crop to start selling' : `${products.length} ${products.length === 1 ? 'product' : 'products'} live`}</p>
                     </div>
-                    <button onClick={openAddModal} className="btn btn-primary">+ Add Product</button>
+                    <button onClick={openAddModal} className="btn btn-primary">Add product</button>
                 </div>
 
                 {products.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-state-icon">🌾</div>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'var(--color-bg-soft)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: '1.2rem' }} aria-hidden="true">—</div>
                         <h3>No products yet</h3>
-                        <p>Start by adding your first product</p>
-                        <button onClick={openAddModal} className="btn btn-primary">Add Product</button>
+                        <p>Add your harvest with a photo, quantity, and price — buyers nearby will see it.</p>
+                        <button onClick={openAddModal} className="btn btn-primary">Add your first product</button>
                     </div>
                 ) : (
                     <div className="products-grid grid grid-3">
@@ -120,14 +120,14 @@ const ProductManagement = () => {
                                 <div className="product-content">
                                     <span className="badge badge-primary">{product.category}</span>
                                     <h3 className="product-name">{product.productName}</h3>
-                                    <p className="product-desc">{product.description?.substring(0, 80)}...</p>
+                                    <p className="product-desc">{product.description}</p>
                                     <div className="product-stats">
-                                        <span>Stock: {product.currentQuantity} kg</span>
+                                        <span>{product.currentQuantity} kg available</span>
                                         <span className="product-price">₹{product.price}/kg</span>
                                     </div>
                                     <div className="product-actions">
-                                        <button onClick={() => openEditModal(product)} className="btn btn-secondary">Edit</button>
-                                        <button onClick={() => handleDelete(product._id)} className="btn btn-danger">Delete</button>
+                                        <button onClick={() => openEditModal(product)} className="btn btn-secondary btn-sm">Edit</button>
+                                        <button onClick={() => handleDelete(product._id)} className="btn btn-outline-danger btn-sm">Remove</button>
                                     </div>
                                 </div>
                             </div>
@@ -139,20 +139,23 @@ const ProductManagement = () => {
                     <div className="modal-overlay" onClick={() => setShowModal(false)}>
                         <div className="modal modal-fixed" onClick={e => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-                                <button className="close-btn" onClick={() => setShowModal(false)}>&times;</button>
+                                <div>
+                                    <h2>{editingProduct ? 'Edit product' : 'Add product'}</h2>
+                                    <p className="text-muted" style={{ fontSize: '0.82rem', marginTop: '4px' }}>{editingProduct ? 'Update quantity, price or photo' : 'Add what you are harvesting today'}</p>
+                                </div>
+                                <button className="close-btn" onClick={() => setShowModal(false)} aria-label="Close">&times;</button>
                             </div>
                             <form onSubmit={handleSubmit} className="modal-form">
                                 <div className="modal-body">
                                     <div className="form-group">
-                                        <label>Product Name</label>
+                                        <label>What are you selling? <span style={{ color: 'var(--color-danger)' }}>*</span></label>
                                         <input type="text" name="productName" value={formData.productName}
-                                            onChange={handleChange} className="form-input" required />
+                                            onChange={handleChange} className="form-input" required placeholder="e.g. Tomatoes, Wheat" />
                                     </div>
                                     <div className="form-group">
-                                        <label>Description</label>
+                                        <label>Describe it</label>
                                         <textarea name="description" value={formData.description}
-                                            onChange={handleChange} className="form-input" rows="3" required />
+                                            onChange={handleChange} className="form-input" rows="3" required placeholder="Variety, freshness, harvest date" />
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
@@ -162,22 +165,20 @@ const ProductManagement = () => {
                                             </select>
                                         </div>
                                         <div className="form-group">
-                                            <label>Quantity (kg)</label>
+                                            <label>Quantity (kg) <span style={{ color: 'var(--color-danger)' }}>*</span></label>
                                             <input type="number" name="quantity" value={formData.quantity}
-                                                onChange={handleChange} className="form-input" required min="1" />
-                                        </div>
-                                    </div>
-                                    <div className="form-row">
-                                        <div className="form-group flex-1">
-                                            <label>Price (₹/kg)</label>
-                                            <input type="number" name="price" value={formData.price}
-                                                onChange={handleChange} className="form-input" required min="1"
-                                                placeholder="e.g. 40" />
+                                                onChange={handleChange} className="form-input" required min="1" placeholder="e.g. 50" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label>Product Image</label>
-                                        <div className="image-input-container">
+                                        <label>Price — ₹ per kg <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+                                        <input type="number" name="price" value={formData.price}
+                                            onChange={handleChange} className="form-input" required min="1"
+                                            placeholder="e.g. 40" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Add a photo</label>
+                                        <div className="image-input-container" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-light)', borderRadius: '10px', padding: '12px' }}>
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -200,23 +201,21 @@ const ProductManagement = () => {
                                                 className="file-input-hidden"
                                                 style={{ display: 'none' }}
                                             />
-                                            <label htmlFor="file-upload" className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', marginBottom: '0.5rem', display: 'inline-block' }}>
-                                                Choose File
-                                            </label>
-                                            <p className="help-text">Max size: 2MB. Supported: JPG, PNG</p>
-
-                                            <div className="url-toggle">
-                                                <span>Or </span>
-                                                <button type="button" className="btn-link" onClick={() => {
-                                                    const url = prompt("Enter Image URL:");
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                <label htmlFor="file-upload" className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', marginBottom: 0 }}>
+                                                    Choose photo
+                                                </label>
+                                                <span className="text-muted" style={{ fontSize: '0.78rem' }}>Max 2MB · JPG or PNG</span>
+                                                <button type="button" onClick={() => {
+                                                    const url = prompt("Enter image URL:");
                                                     if (url) setFormData(prev => ({ ...prev, image: url }));
-                                                }}>enter image URL</button>
+                                                }} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}>or paste URL</button>
                                             </div>
 
                                             {formData.image && (
-                                                <div className="image-preview">
-                                                    <img src={formData.image} alt="Preview" />
-                                                    <button type="button" className="btn-icon-remove" onClick={() => setFormData(prev => ({ ...prev, image: '' }))}>×</button>
+                                                <div className="image-preview" style={{ marginTop: '12px', position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--color-border)', background: '#fff' }}>
+                                                    <img src={formData.image} alt="Preview" style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', display: 'block' }} />
+                                                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, image: '' }))} className="btn btn-secondary btn-sm" style={{ position: 'absolute', top: '8px', right: '8px', padding: '6px 10px' }}>Remove</button>
                                                 </div>
                                             )}
                                         </div>
@@ -224,7 +223,7 @@ const ProductManagement = () => {
                                 </div>
                                 <div className="modal-actions">
                                     <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">Cancel</button>
-                                    <button type="submit" className="btn btn-primary">{editingProduct ? 'Update' : 'Create'}</button>
+                                    <button type="submit" className="btn btn-primary">{editingProduct ? 'Save changes' : 'Publish product'}</button>
                                 </div>
                             </form>
                         </div>
