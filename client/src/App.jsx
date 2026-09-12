@@ -31,40 +31,28 @@ const ProfilePage = lazy(() => import('./pages/buyer/ProfilePage.jsx'));
 const BuyerMessages = lazy(() => import('./pages/buyer/BuyerMessages.jsx'));
 
 const FarmerPublicProfile = lazy(() => import('./pages/public/FarmerPublicProfile.jsx'));
-
-const HomePage = () => (
-    <div className="home-page">
-        <div className="hero">
-            <div className="container">
-                <h1>Farm Fresh, Direct to You</h1>
-                <p>Connect directly with local farmers for the freshest produce at fair prices</p>
-                <div className="hero-buttons">
-                    <a href="/auth/signup" className="btn btn-primary btn-lg">Get Started</a>
-                    <a href="/buyer/browse" className="btn btn-secondary btn-lg">Browse Products</a>
-                </div>
-            </div>
-        </div>
-        <style>{`
-      .home-page { min-height: 70vh; }
-      .hero {
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-        color: white;
-        padding: 6rem 0;
-        text-align: center;
-      }
-      .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
-      .hero p { font-size: 1.25rem; opacity: 0.9; margin-bottom: 2rem; }
-      .hero-buttons { display: flex; gap: 1rem; justify-content: center; }
-      .hero .btn-secondary { background: rgba(255,255,255,0.2); border: 2px solid white; color: white; }
-    `}</style>
-    </div>
-);
+const HomePage = lazy(() => import('./pages/public/HomePage.jsx'));
 
 const UnauthorizedPage = () => (
-    <div className="container" style={{ textAlign: 'center', padding: '4rem' }}>
-        <h1>🚫 Unauthorized</h1>
-        <p>You don't have permission to access this page.</p>
-        <a href="/" className="btn btn-primary">Go Home</a>
+    <div className="unauthorized-page">
+        <div className="unauthorized-card">
+            <div className="unauthorized-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                </svg>
+            </div>
+            <h1>Access restricted</h1>
+            <p>You don't have permission to view this page.</p>
+            <a href="/" className="btn btn-primary">Go to home</a>
+        </div>
+        <style>{`
+            .unauthorized-page { text-align: center; padding: 4rem 1rem; }
+            .unauthorized-card { max-width: 420px; margin: 0 auto; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 32px 24px; }
+            .unauthorized-icon { width: 56px; height: 56px; border-radius: 999px; background: var(--color-danger-light); border: 1px solid #E8C4C4; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--color-danger); }
+            .unauthorized-card h1 { font-size: 1.25rem; margin-bottom: 8px; }
+            .unauthorized-card p { color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 20px; }
+        `}</style>
     </div>
 );
 
