@@ -40,8 +40,8 @@ const LoginPage = () => {
         <div className="auth-page">
             <div className="auth-container">
                 <div className="auth-header">
-                    <h1 className="auth-title">Welcome Back</h1>
-                    <p className="auth-subtitle">Sign in to your AgriDirect account</p>
+                    <h1 className="auth-title">Welcome back</h1>
+                    <p className="auth-subtitle">Sign in to continue to KisanSetu</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
