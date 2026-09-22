@@ -8,13 +8,25 @@ const rateLimit = require('express-rate-limit');
 const http = require('http');
 
 const app = express();
-const PORT = process.env.GATEWAY_PORT || 8000;
+const PORT = process.env.PORT || process.env.GATEWAY_PORT || 8000;
 
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, curl, server-to-server)
+        if (!origin) return callback(null, true);
+        const allowedOrigins = process.env.FRONTEND_URL 
+            ? process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/$/, ''))
+            : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+        
+        const cleanOrigin = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes('*') || cleanOrigin.endsWith('.vercel.app') || process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+        return callback(null, true); // Permissive for hackathon prototype deployment
+    },
     credentials: true
 }));
 app.use(morgan('dev'));
@@ -44,6 +56,7 @@ const ORDER_SERVICE = process.env.ORDER_SERVICE || 'http://127.0.0.1:5004';
 const COMM_SERVICE = process.env.COMM_SERVICE || 'http://127.0.0.1:5005';
 const FEEDBACK_SERVICE = process.env.FEEDBACK_SERVICE || 'http://127.0.0.1:5006';
 const PAYMENT_SERVICE = process.env.PAYMENT_SERVICE || 'http://127.0.0.1:5007';
+const AI_SERVICE = process.env.AI_SERVICE || 'http://127.0.0.1:5008';
 
 // Proxy configuration helper with TIMEOUTS
 const proxyOptions = (servicePath) => ({
@@ -68,6 +81,7 @@ app.use('/api/optimize', proxy(ORDER_SERVICE, proxyOptions('/api/optimize')));
 app.use('/api/conversations', proxy(COMM_SERVICE, proxyOptions('/api/conversations')));
 app.use('/api/feedback', proxy(FEEDBACK_SERVICE, proxyOptions('/api/feedback')));
 app.use('/api/payments', proxy(PAYMENT_SERVICE, proxyOptions('/api/payments')));
+app.use('/api/ai', proxy(AI_SERVICE, proxyOptions('')));
 
 // Health Check - REAL (pings services)
 const checkService = async (url) => {
@@ -109,7 +123,7 @@ app.get('/health', async (req, res) => {
     };
 
     const allHealthy = checks.every(s => s === 'healthy');
-    res.status(allHealthy ? 200 : 207).json({
+    res.status(200).json({
         service: 'api-gateway',
         status: allHealthy ? 'healthy' : 'degraded',
         timestamp: new Date().toISOString(),

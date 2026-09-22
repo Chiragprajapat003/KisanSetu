@@ -1,0 +1,52 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install Python & build tools for AI service
+RUN apk add --no-cache python3 py3-pip make g++ gcc
+
+# Create Python virtual environment and install dependencies
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY services/ai_connection/requirements.txt ./services/ai_connection/
+RUN pip install --no-cache-dir -r ./services/ai_connection/requirements.txt
+
+# Copy package files and install Node.js dependencies for each service
+COPY services/shared/package*.json ./services/shared/
+RUN cd services/shared && npm install --production
+
+COPY services/auth/package*.json ./services/auth/
+RUN cd services/auth && npm install --production
+
+COPY services/user/package*.json ./services/user/
+RUN cd services/user && npm install --production
+
+COPY services/product/package*.json ./services/product/
+RUN cd services/product && npm install --production
+
+COPY services/order/package*.json ./services/order/
+RUN cd services/order && npm install --production
+
+COPY services/communication/package*.json ./services/communication/
+RUN cd services/communication && npm install --production
+
+COPY services/feedback/package*.json ./services/feedback/
+RUN cd services/feedback && npm install --production
+
+COPY services/payment/package*.json ./services/payment/
+RUN cd services/payment && npm install --production
+
+COPY services/gateway/package*.json ./services/gateway/
+RUN cd services/gateway && npm install --production
+
+# Copy source code
+COPY services ./services
+COPY start-render.sh ./start-render.sh
+
+RUN chmod +x ./start-render.sh
+
+# Render binds to the dynamic PORT environment variable (default: 8000)
+EXPOSE 8000 5005 5008
+
+CMD ["./start-render.sh"]
