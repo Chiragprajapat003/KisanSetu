@@ -30,11 +30,12 @@ const verifyOTP = (inputOtp, storedHash) => {
 // Notify Farmer (Microservice communication)
 const notifyFarmer = async (farmerId, type, data) => {
     try {
-        await axios.post(`${process.env.COMMUNICATION_SERVICE}/api/notifications/farmer`, {
+        const commUrl = process.env.COMM_SERVICE || process.env.COMMUNICATION_SERVICE || 'http://127.0.0.1:5005';
+        await axios.post(`${commUrl}/api/notifications/farmer`, {
             farmerId,
             type,
             data
-        });
+        }, { timeout: 3000 });
     } catch (error) {
         console.error('Failed to notify farmer:', error.message);
     }
@@ -138,17 +139,16 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         orderObj.devOtp = otp;
         createdOrders.push(orderObj);
 
-        console.log(`[TRACE] Sending OTP email to ${buyer.email}...`);
-        const emailSent = await sendOTP(buyer.email, otp, {
+        console.log(`[TRACE] Triggering OTP email to ${buyer.email}...`);
+        sendOTP(buyer.email, otp, {
             productName: `Order from ${farmer.name}`,
             quantity: group.products.length,
             totalPrice: group.totalPrice
+        }).then(sent => {
+            console.log(`[TRACE] Email sent result for ${buyer.email}: ${sent}`);
+        }).catch(err => {
+            console.error(`⚠️ Non-blocking email error:`, err.message);
         });
-        console.log(`[TRACE] Email sent result: ${emailSent}`);
-
-        if (!emailSent) {
-            console.error(`⚠️ Failed to send OTP email to ${buyer.email}. Use console OTP: ${otp}`);
-        }
 
         if (order.paymentMethod === 'cash') {
             console.log(`[TRACE] Notifying farmer...`);

@@ -82,6 +82,7 @@ app.use('/api/conversations', proxy(COMM_SERVICE, proxyOptions('/api/conversatio
 app.use('/api/feedback', proxy(FEEDBACK_SERVICE, proxyOptions('/api/feedback')));
 app.use('/api/payments', proxy(PAYMENT_SERVICE, proxyOptions('/api/payments')));
 app.use('/api/ai', proxy(AI_SERVICE, proxyOptions('')));
+app.use('/socket.io', proxy(COMM_SERVICE, proxyOptions('/socket.io')));
 
 // Health Check - REAL (pings services)
 const checkService = async (url) => {
