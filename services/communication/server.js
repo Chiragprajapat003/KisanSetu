@@ -85,7 +85,7 @@ const startServer = async () => {
         // Setup socket handlers
         setupSocketHandlers(io);
 
-        server.listen(PORT, () => {
+        server.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 Communication Service running on port ${PORT}`);
             console.log(`📡 WebSocket server ready`);
         });
