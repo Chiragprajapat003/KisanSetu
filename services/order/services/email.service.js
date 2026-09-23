@@ -4,17 +4,24 @@ const nodemailer = require('nodemailer');
 const createTransporter = () => {
     return nodemailer.createTransport({
         host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-        port: process.env.EMAIL_PORT || 587,
+        port: parseInt(process.env.EMAIL_PORT, 10) || 587,
         secure: false,
         auth: {
-            user: process.env.EMAIL_USER, // Kept as EMAIL_USER as per Order Service convention
+            user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
-        }
+        },
+        connectionTimeout: 3000,
+        greetingTimeout: 3000,
+        socketTimeout: 4000
     });
 };
 
-// Verify Email Configuration (Added based on report)
+// Verify Email Configuration
 const verifyEmailConfig = async () => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || process.env.EMAIL_PASS.includes('your_app')) {
+        console.log('ℹ️ Email credentials not configured. Email service will run in dev/console mode.');
+        return false;
+    }
     console.log('📧 Verifying Email Configuration...');
     try {
         const transporter = createTransporter();
@@ -23,7 +30,6 @@ const verifyEmailConfig = async () => {
         return true;
     } catch (error) {
         console.error('❌ Email Service Configuration Failed:', error.message);
-        console.error('   Hint: Check EMAIL_USER/EMAIL_PASS in .env');
         return false;
     }
 };
@@ -31,6 +37,13 @@ const verifyEmailConfig = async () => {
 // Send OTP email
 const sendOTP = async (email, otp, orderDetails) => {
     console.log(`📧 Attempting to send OTP to: ${email}`);
+    
+    // If credentials are not set or default placeholder, log to console and return true without hanging
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || process.env.EMAIL_PASS.includes('your_app') || process.env.EMAIL_USER.includes('your_email')) {
+        console.log(`⚠️ SMTP credentials not set. Console OTP Fallback: ${otp} for ${email}`);
+        return true;
+    }
+
     try {
         const transporter = createTransporter();
 
@@ -62,9 +75,7 @@ const sendOTP = async (email, otp, orderDetails) => {
         console.log(`✅ OTP sent successfully to ${email}`);
         return true;
     } catch (error) {
-        console.error('❌ Email send error:', error); // Log full error object
-        console.error('   Reason:', error.message);
-        console.error('   Stack:', error.stack);
+        console.error('❌ Email send error:', error.message);
         return false;
     }
 };

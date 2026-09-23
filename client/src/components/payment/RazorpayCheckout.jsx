@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './Payment.css';
+import { verifyPayment } from '../../services/payment.service';
 
 const RazorpayCheckout = ({ orderDetails, onSuccess, onError, user }) => {
     const [loading, setLoading] = useState(false);
@@ -37,27 +38,20 @@ const RazorpayCheckout = ({ orderDetails, onSuccess, onError, user }) => {
             setTimeout(async () => {
                 try {
                     const mockPaymentId = `pay_mock_${Date.now()}`;
-                    const verifyRes = await fetch('/api/payments/verify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        },
-                        body: JSON.stringify({
-                            razorpay_order_id: orderDetails.razorpayOrderId,
-                            razorpay_payment_id: mockPaymentId,
-                            razorpay_signature: 'mock_signature'
-                        })
+                    const verifyResponse = await verifyPayment({
+                        razorpay_order_id: orderDetails.razorpayOrderId,
+                        razorpay_payment_id: mockPaymentId,
+                        razorpay_signature: 'mock_signature'
                     });
 
-                    const verifyData = await verifyRes.json();
+                    const verifyData = verifyResponse.data;
                     if (verifyData.success) {
                         onSuccess(verifyData);
                     } else {
                         onError(verifyData.message || 'Simulated payment verification failed');
                     }
                 } catch (error) {
-                    onError('Payment verification error: ' + error.message);
+                    onError('Payment verification error: ' + (error.response?.data?.message || error.message));
                 } finally {
                     setLoading(false);
                 }
@@ -75,21 +69,14 @@ const RazorpayCheckout = ({ orderDetails, onSuccess, onError, user }) => {
             order_id: orderDetails.razorpayOrderId,
             handler: async function (response) {
                 try {
-                    // Send verification to backend
-                    const verifyRes = await fetch('/api/payments/verify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        })
+                    // Send verification to backend via API service
+                    const verifyResponse = await verifyPayment({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature
                     });
 
-                    const verifyData = await verifyRes.json();
+                    const verifyData = verifyResponse.data;
 
                     if (verifyData.success) {
                         onSuccess(verifyData);
@@ -97,7 +84,8 @@ const RazorpayCheckout = ({ orderDetails, onSuccess, onError, user }) => {
                         onError(verifyData.message || 'Payment verification failed');
                     }
                 } catch (error) {
-                    onError('Payment verification error');
+                    console.error('Verification error:', error);
+                    onError(error.response?.data?.message || 'Payment verification error');
                 }
             },
             prefill: {

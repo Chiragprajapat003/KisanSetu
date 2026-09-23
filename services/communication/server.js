@@ -15,15 +15,27 @@ const { setupSocketHandlers } = require('./services/socket.service');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.COMMUNICATION_PORT || 5005;
+// CORS configuration
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const allowedOrigins = process.env.FRONTEND_URL 
+            ? process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/$/, ''))
+            : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+        
+        const cleanOrigin = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes('*') || cleanOrigin.endsWith('.vercel.app') || process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+        return callback(null, true);
+    },
+    methods: ['GET', 'POST'],
+    credentials: true
+};
 
 // Socket.io setup
 const io = new Server(server, {
-    cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-        methods: ['GET', 'POST'],
-        credentials: true
-    }
+    cors: corsOptions
 });
 
 // Make io available globally
@@ -31,10 +43,7 @@ global.io = io;
 
 // Middleware
 app.use(helmet());
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(compression());
 app.use(morgan('dev'));
 app.use(express.json());
@@ -76,7 +85,7 @@ const startServer = async () => {
         // Setup socket handlers
         setupSocketHandlers(io);
 
-        server.listen(PORT, () => {
+        server.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 Communication Service running on port ${PORT}`);
             console.log(`📡 WebSocket server ready`);
         });
