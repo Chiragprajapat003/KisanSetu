@@ -1,18 +1,18 @@
-# Contributing to AgriDirect
+# Contributing to KisanSetu
 
 First off, thanks for taking the time to contribute! 🎉
 
-The following is a set of guidelines for contributing to AgriDirect and its packages. These are mostly guidelines, not rules. Use your best judgment and feel free to propose changes to this document in a pull request.
+The following is a set of guidelines for contributing to KisanSetu and its packages. These are mostly guidelines, not rules. Use your best judgment and feel free to propose changes to this document in a pull request.
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [AgriDirect Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+This project and everyone participating in it is governed by the [KisanSetu Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
 
-This section guides you through submitting a bug report for AgriDirect. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
+This section guides you through submitting a bug report for KisanSetu. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
 
 - **Check if the bug has already been reported.**
 - **Use a clear and descriptive title.**
@@ -20,7 +20,7 @@ This section guides you through submitting a bug report for AgriDirect. Followin
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for AgriDirect, including completely new features and minor improvements to existing functionality.
+This section guides you through submitting an enhancement suggestion for KisanSetu, including completely new features and minor improvements to existing functionality.
 
 - **Use a clear and descriptive title.**
 - **Provide a step-by-step description of the suggested enhancement.**

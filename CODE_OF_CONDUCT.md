@@ -1,4 +1,4 @@
-# AgriDirect Code of Conduct
+# KisanSetu Code of Conduct
 
 ## Our Pledge
 

@@ -11,9 +11,9 @@ Use this section to tell people about which versions of your project are current
 
 ## Reporting a Vulnerability
 
-We take the security of AgriDirect seriously. If you discover a security vulnerability, please do not report it in the issue tracker.
+We take the security of KisanSetu seriously. If you discover a security vulnerability, please do not report it in the issue tracker.
 
-**Please report vulnerabilities by emailing security@agridirect.com** (Replace with actual email).
+**Please report vulnerabilities by emailing anand.suthar.cg@gmail.com**.
 
 We will create a fix and release a new version as soon as possible. We will also provide credit to the reporter if desired.
 
